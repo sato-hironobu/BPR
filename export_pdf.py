@@ -3,38 +3,44 @@ from fpdf import FPDF
 from datetime import datetime
 import sys
 
-DB_FILE = "bp_data.db"
-OUTPUT_FILE = "blood_pressure_records.pdf"
+DB_FILE = "./db/bp_data.db"
+OUTPUT_FILE = "./pdf/blood_pressure_records.pdf"
+FONT_IPAEXGOTHIC_FILE = "./font/ipaexg.ttf"
 
 class PDF(FPDF):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.add_font('IPAexGothic', '', FONT_IPAEXGOTHIC_FILE, uni=True)
+
     def header(self):
-        self.set_font("Arial", "B", 16)
-        self.cell(0, 10, f"Blood Pressure Records - {self.period_str}", ln=True, align="C")
-        self.set_font("Arial", "", 10)
-        self.cell(0, 10, f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M')}", ln=True, align="C")
+        self.set_font("IPAexGothic", "", 16)
+        self.cell(0, 10, f"血圧記録 - {self.period_str}", ln=True, align="C")
+        self.set_font("IPAexGothic", "", 10)
+        self.cell(0, 10, f"作成日: {datetime.now().strftime('%Y-%m-%d %H:%M')}", ln=True, align="C")
         self.ln(5)
 
     def footer(self):
         self.set_y(-15)
-        self.set_font("Arial", "I", 8)
+        self.set_font("IPAexGothic", "", 8)
         self.cell(0, 10, f"Page {self.page_no()}", align="C")
 
     def add_table(self, data):
-        self.set_font("Arial", "B", 12)
+        self.set_font("IPAexGothic", "", 12)
         col_widths = [45, 30, 30, 30, 30]
-        headers = ["Date & Time", "Systolic", "Diastolic", "Pulse", "Time Period"]
+        headers = ["日時", "収縮期", "拡張期", "脈拍", "時間帯"]
         for i, header in enumerate(headers):
             self.cell(col_widths[i], 10, header, border=1, align="C")
         self.ln()
 
-        self.set_font("Arial", "", 12)
+        self.set_font("IPAexGothic", "", 12)
         for row in data:
             timestamp, systolic, diastolic, pulse, time_period = row
+            timestamp = datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d %H:%M")
             period_str = {
-                'M': 'Morning',
-                'N': 'Night',
-                None: 'Unspecified'
-            }.get(time_period, 'Unspecified')
+                'M': '朝',
+                'N': '夜',
+                None: '未設定'
+            }.get(time_period, '未設定')
 
             row_data = [
                 timestamp,

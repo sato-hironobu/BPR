@@ -2,9 +2,30 @@ import sqlite3
 from datetime import datetime
 import sys
 
-DB_FILE = "bp_data.db"
+DB_FILE = "./db/bp_data.db"
 
 def init_db():
+    """
+    Initializes the local SQLite database to store blood pressure and pulse records.
+
+    The database will contain a table named 'records' with the following fields:
+
+    - id (INTEGER): A unique, auto-incremented identifier for each measurement entry.
+    - timestamp (TEXT): The date and time when the measurement was taken.
+    - systolic (INTEGER): The systolic blood pressure (often called the "top" or "maximum" number), 
+      representing the pressure in the arteries when the heart contracts and pumps blood. 
+      This value reflects the maximum force your heart exerts on the walls of your arteries.
+    - diastolic (INTEGER): The diastolic blood pressure (the "bottom" number), indicating the pressure 
+      in the arteries when the heart is at rest between beats. This reflects the baseline arterial tension.
+    - pulse (INTEGER): The heart rate in beats per minute (bpm), representing how many times the heart 
+      beats in one minute. Pulse provides additional insight into cardiovascular condition and autonomic activity.
+    - time_period (TEXT): A textual label for the time of day when the measurement was taken, such as 
+      'morning' or 'evening'. This allows tracking of diurnal variation in blood pressure and pulse.
+
+    This structure is designed to support long-term health tracking and to help detect patterns 
+    related to hypertension, stress, medication effects, and overall cardiovascular fitness.
+    """
+    
     conn = sqlite3.connect(DB_FILE)
     c = conn.cursor()
     c.execute('''
